@@ -1,0 +1,65 @@
+#
+# Reference AV1 Codec Library.
+#
+# Building and testing links:
+#  - https://aomedia.googlesource.com/aom/#building-the-library-and-applications
+#  - https://aomedia.googlesource.com/aom/#testing-the-av1-codec
+#  - https://www.archlinux.org/packages/extra/x86_64/aom/
+#
+
+{% set name = 'aom' %}
+{% set version = '1.0.0' %}
+{% set commit = 'd14c5bb4f336ef1842046089849dee4a301fbbf0' %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://aomedia.googlesource.com/aom/+archive/{{ commit }}.tar.gz
+  # Weirdly this gets different each download...
+  # sha256: 'df581b15e0acf474441a2e47ed7918c45d78c2aeebb7eb217aa74453e95b3587'
+
+  # Conda-forge unfriendly alternative: use git
+  #  git_rev: v{{ version }}
+  #  git_url: https://aomedia.googlesource.com/aom
+
+build:
+  number: 0
+  skip: True  # [not linux]
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - cmake
+    - perl
+    - yasm
+    # for the tests (which we would run at build stage)
+    # beware, tests are expensive (data downloads & many of them, some fairly slow)
+    # - python 3
+
+test:
+  commands:
+    - aomenc --help
+    - aomdec --help
+    - test -f ${PREFIX}/include/aom/aom.h      # [unix]
+    - test -f ${PREFIX}/lib/libaom.so          # [linux]
+    - test -f ${PREFIX}/lib/pkgconfig/aom.pc   # [linux]
+
+about:
+  home: https://aomedia.org/
+  license: BSD custom:PATENTS
+  license_family: BSD
+  # No multiple license files: https://github.com/conda/conda-build/issues/1247
+  # license_file: LICENSE
+  # license_file: PATENTS
+  # So we cat the two in one (beware of changes)
+  license_file: LICENSES
+  summary: 'Alliance for Open Media video codec'
+  description: |
+    AOMedia Video 1 (AV1), is an open, royalty-free video coding format designed for
+    video transmissions over the Internet.
+
+extra:
+  recipe-maintainers:
+    - sdvillal
