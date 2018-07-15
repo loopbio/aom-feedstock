@@ -25,8 +25,11 @@ source:
   #  git_url: https://aomedia.googlesource.com/aom
 
 build:
-  number: 0
+  number: 1
   skip: True  # [not linux]
+  run_exports:
+    # this is a bit of hit and miss, as I do not know how AOM will manage versioning
+    - {{ pin_subpackage('aom') }}
 
 requirements:
   build:
